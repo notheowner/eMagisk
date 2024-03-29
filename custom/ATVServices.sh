@@ -498,40 +498,23 @@ if result=$(check_mitmpkg); then
 					fi
 				done
 				log -p i -t eMagiskATVService "Scheduling next check in 4 minutes..."
-			else # As rdm variables aren't configured, we'll check the logs last timestamp
-				log -p i -t eMagiskATVService "Started health check!"
-				if [[ $MITMPKG == com.pokemod.atlas* ]]; then
-					log_path="/data/local/tmp/atlas.log"
-				elif [[ $MITMPKG == com.pokemod.aegis* ]]; then
-					log_path="/data/local/tmp/aegis.log"
-				elif [[ $MITMPKG == com.sy1vi3* ]]; then
-					if ! ps -a | grep -v grep | grep "$MITMPKG"; then
-						log -p i -t eMagiskATVService "Process $MITMPKG is not alive, starting it"
-						am start -n $MITMPKG/.MainActivity
-						counter=$((counter+1))
-      					else
-	   					log -p i -t eMagiskATVService "Process $MITMPKG is alive. No action required."
-     						counter=0
-     					fi
-	  				continue
-				elif [[ $MITMPKG == com.gocheats.launcher ]]; then
-					log_path=$(ls -lt /data/data/com.nianticlabs.pokemongo/cache/Exegg* | grep -E "^-" | head -n 1 | awk '{print $NF}')
-				else
-					log -p i -t eMagiskATVService "No MITM detected ($MITMPKG?), skipping health check."
-					continue
-				fi
-				# Store the timestamp of the log file into another variable using stat
-				timestamp_epoch=$(stat -c "%Y" "$log_path")
-				current_time=$(date +%s)
+			else # As rdm variables aren't configured, we'll check Rotom
 
-				calcTimeDiff=$(( $current_time - $timestamp_epoch ))
-				if [[ $calcTimeDiff -le 120 ]]; then
-					log -p i -t eMagiskATVService "The log was modified within the last 120 seconds. No action required."
-     					counter=0
+				# Health check based on jinnatar's mitm_nanny logic
+				log -p i -t eMagiskATVService "Starting Rotom health check"
+
+				# This assumes only Aegis config at the moment.
+				rotom="\$(jq -r '.rotomUrl' /data/local/tmp/aegis_config.json)"
+
+				# If active connections to Rotom are less than 1 restart MITM
+				activeConnections=$(ss -pnt | grep pokemongo | grep "\${rotom}" | wc -l)
+				if [[ $activeConnections -lt "1" ]]; then
+					log -p i -t eMagiskATVService "Found less than 1 connection to Rotom, restarting..."
+						force_restart
+						counter=$((counter+1))
 				else
-					log -p i -t eMagiskATVService "The log wasn't modified within the last 120 seconds. Forcing restart of MITM. ts: $timestamp_epoch, time now: $current_time"
-					force_restart
-					counter=$((counter+1))
+					log -p i -t eMagiskATVService "Active connections to Rotom found, all good in the hood(maybe)"
+					counter=0
 				fi
 			fi
 		done
