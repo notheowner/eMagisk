@@ -35,7 +35,7 @@ temperature="$(echo $(($(cat /sys/class/thermal/thermal_zone0/temp) / 1000)))"
 
 get_mitm_pkg() {
     local mitm_pkg
-    mitm_pkg=$(busybox ps aux | grep -E -C0 "atlas|gocheats" | grep -C0 -v grep | awk -F ' ' '/com.pokemod.atlas/{print $NF} /com.gocheats.launcher/{print $NF}' | grep -E -C0 "atlas|gocheats" | sed 's/^[0-9]*://' | sed 's/:mapping$//')
+    mitm_pkg=$(busybox ps aux | grep -E -C0 "pokemod|gocheats|sy1vi3" | grep -C0 -v grep | awk -F ' ' '/com.pokemod/{print $NF} /com.sy1vi3/{print $NF} /com.gocheats.launcher/{print $NF}' | grep -E -C0 "gocheats|pokemod|sy1vi3" | sed -e 's/^[0-9]*://' -e 's@:.*@@g' | sort | uniq)
     if [ -z "$mitm_pkg" ]; then
         echo "NOT RUNNING"
     else
@@ -47,7 +47,7 @@ MITMPKG=$(get_mitm_pkg)
 mitmDeviceName="NONAME"
 # Check if $MITMPKG contains "aegis"
 if echo "$MITMPKG" | grep -q "aegis"; then
-    mitmDeviceName=$(cat /data/local/tmp/atlas_config.json | awk -F\" '{print $12}')
+    mitmDeviceName=$(cat /data/local/tmp/aegis_config.json | awk -F\" '{print $12}')
 # Check if $MITMPKG contains "atlas"
 elif echo "$MITMPKG" | grep -q "atlas"; then
     mitmDeviceName=$(cat /data/local/tmp/atlas_config.json | awk -F\" '{print $12}')
