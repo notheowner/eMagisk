@@ -92,10 +92,13 @@ fi
 
 # Check if $no_license is not zero
 if [ "$no_license" -ne 0 ]; then
-  echo "WARNING: This device has no license"
-  echo "   / \\"
-  echo "  / ! \\"
-  echo " /_____\\"
+  RED='\033[0;31m' # ANSI color code for red
+  NC='\033[0m'     # ANSI color code to reset color
+
+  echo -e "${RED}WARNING: This device has no license${NC}"
+  echo -e "${RED}   / \\${NC}"
+  echo -e "${RED}  / ! \\${NC}"
+  echo -e "${RED} /_____\\${NC}"
 fi
 
 cd /data/local/tmp/
