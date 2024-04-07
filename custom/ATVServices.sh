@@ -467,6 +467,9 @@ if result=$(check_mitmpkg); then
 			if [[ $counter -gt 3 ]];then
 				log -p i -t eMagiskATVService "Critical restart threshold of $counter reached. Rebooting device..."
 				webhook "Critical restart threshold of $counter reached. Rebooting device..."
+				pm clear com.android.vending
+				pm clear com.google.android.gms
+				pm trim-caches 32G
 				reboot
 				# We need to wait for the reboot to actually happen or the process might be interrupted
 				sleep 60 
