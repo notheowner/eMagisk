@@ -470,6 +470,10 @@ if result=$(check_mitmpkg); then
 				pm clear com.android.vending
 				pm clear com.google.android.gms
 				pm trim-caches 32G
+				if adb shell pidof com.nianticlabs.pokemongo >/dev/null; then
+				    am force-stop com.nianticlabs.pokemongo
+				fi
+    				rm -rf /data/data/com.nianticlabs.pokemongo/cache/*
 				reboot
 				# We need to wait for the reboot to actually happen or the process might be interrupted
 				sleep 60 
