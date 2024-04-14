@@ -550,7 +550,7 @@ if result=$(check_mitmpkg); then
 				elif [[ $MITMPKG == com.pokemod.aegis* ]]; then
 					log_path="/data/local/tmp/aegis.log"
 				elif [[ $MITMPKG == com.sy1vi3* ]]; then
-					if ! ps -a | grep -v grep | grep "$MITMPKG"; then
+					if ! ps -a | grep -vE "grep|worker" | grep "$MITMPKG" ; then
 						log -p i -t eMagiskATVService "Process $MITMPKG is not alive, starting it"
 						am start -n $MITMPKG/.MainActivity
 						counter=$((counter+1))
