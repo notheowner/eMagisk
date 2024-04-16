@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "mkshrc"
   workflow_dispatch:
 
 jobs:

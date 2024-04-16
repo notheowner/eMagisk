@@ -31,7 +31,6 @@ done
 androidVersion=$(getprop ro.build.version.release)
 mitm_version="NOT INSTALLED"
 pogo_version="NOT INSTALLED"
-temperature="$(echo $(($(cat /sys/class/thermal/thermal_zone0/temp) / 1000)))"
 
 get_mitm_pkg() {
     local mitm_pkg
@@ -43,33 +42,6 @@ get_mitm_pkg() {
     fi
 }
 MITMPKG=$(get_mitm_pkg)
-
-mitmDeviceName="NONAME"
-# Check if $MITMPKG contains "aegis"
-if echo "$MITMPKG" | grep -q "cosmog"; then
-    mitmDeviceName=$(jq -r '.device_id' /data/local/tmp/cosmog.json)
-elif echo "$MITMPKG" | grep -q "aegis"; then
-    mitmDeviceName=$(cat /data/local/tmp/aegis_config.json | awk -F\" '{print $12}')
-# Check if $MITMPKG contains "atlas"
-elif echo "$MITMPKG" | grep -q "atlas"; then
-    mitmDeviceName=$(cat /data/local/tmp/atlas_config.json | awk -F\" '{print $12}')
-elif [ "$MITMPKG" = "com.gocheats.launcher" ]; then
-    mitmDeviceName=$(cat /data/local/tmp/config.json | awk -F\" '/device_name/ {print $4}')
-else
-    if [ -e "/data/local/tmp/atlas_config.json" ]; then
-        mitmDeviceName=$(cat /data/local/tmp/atlas_config.json | awk -F\" '{print $12}')
-#    else
-#        echo "Couldn't load device name from config"
-    fi
-fi
-
-if (( USER_ID )); then PS1='$'; else PS1='#'; fi
-    PS4='[$EPOCHREALTIME] '; PS1='${|
-        local e=$?
-        (( e )) && REPLY+="$e|"
-        return $e
-}$mitmDeviceName:${PWD:-?} '"$PS1 "
-
 POGOPKG=com.nianticlabs.pokemongo
 pogo_version="$(dumpsys package com.nianticlabs.pokemongo | awk -F "=" '/versionName/ {print $2}')"
 
@@ -80,9 +52,8 @@ else
     echo "Android $androidVersion. Pogo: $pogo_version. mitm: $MITMPKG"
 fi
 
-
 if [ -e "/data/local/tmp/aegis.log" ]; then
-    log_path='/data/local/tmp/atlas.log'
+    log_path='/data/local/tmp/aegis.log'
     no_license=$(busybox tail -n150 $log_path | grep 'Not licensed' | wc -l)
     busybox tail $log_path
 elif [ -e "/data/local/tmp/atlas.log" ]; then
@@ -108,31 +79,5 @@ if [ "$no_license" -ne 0 ]; then
 fi
 
 cd /data/local/tmp/
-
-mitm_stop() {
-        am force-stop $POGOPKG
-        killall $POGOPKG
-        if [ $MITMPKG = "com.gocheats.launcher" ]; then
-                am force-stop $MITMPKG
-        else
-                am stopservice $MITMPKG/com.pokemod.atlas.services.MappingService
-                am force-stop $MITMPKG
-        fi
-}
-
-mitm_start() {
-        killall $POGOPKG
-        if [ $MITMPKG = "package:com.gocheats.launcher" ]; then
-                monkey -p $MITMPKG 1
-        else
-                am startservice $MITMPKG/com.pokemod.atlas.services.MappingService
-        fi
-}
-
-mitm_restart() {
-    mitm_stop
-    sleep 5
-    mitm_start
-}
 
 exec env HOME=<SDCARD> <BIN>/bash --rcfile <SDCARD>/.bashrc
