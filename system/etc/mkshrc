@@ -34,7 +34,7 @@ pogo_version="NOT INSTALLED"
 
 get_mitm_pkg() {
     local mitm_pkg
-    mitm_pkg=$(busybox ps aux | grep -E -C0 "pokemod|gocheats|sy1vi3" | grep -C0 -vE "grep|mapping|worker" | awk -F ' ' '/com.pokemod/{print $NF} /com.sy1vi3/{print $NF} /com.gocheats.launcher/{print $NF}' | grep -E -C0 "gocheats|pokemod|sy1vi3" | sed -e 's/^[0-9]*://' -e 's@:.*@@g' | sort | uniq))
+    mitm_pkg=$(busybox ps aux | grep -E -C0 "pokemod|gocheats|sy1vi3" | grep -C0 -v "grep|mapping|worker" | awk -F ' ' '/com.pokemod/{print $NF} /com.sy1vi3/{print $NF} /com.gocheats.launcher/{print $NF}' | grep -E -C0 "gocheats|pokemod|sy1vi3" | sed -e 's/^[0-9]*://' -e 's@:.*@@g' | sort | uniq)
     if [ -z "$mitm_pkg" ]; then
         echo "NOT RUNNING"
     else
