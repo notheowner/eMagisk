@@ -52,6 +52,8 @@ else
     echo "Android $androidVersion. Pogo: $pogo_version. mitm: $MITMPKG"
 fi
 
+# Print most recent logs of MITM on shell login
+# TODO: Cosmog
 if [ -e "/data/local/tmp/aegis.log" ]; then
     log_path='/data/local/tmp/aegis.log'
     no_license=$(busybox tail -n150 $log_path | grep 'Not licensed' | wc -l)
@@ -65,17 +67,6 @@ elif [ "$MITMPKG" = "com.gocheats.launcher" ]; then
     # echo "$logcat_output"
     log_path=$(find /data/data/com.nianticlabs.pokemongo/cache/ -name "Exeggcute_*log" | tail -n1)
     busybox tail $log_path
-fi
-
-# Check if $no_license is not zero
-if [ "$no_license" -ne 0 ]; then
-  RED='\033[0;31m' # ANSI color code for red
-  NC='\033[0m'     # ANSI color code to reset color
-
-  echo -e "${RED}WARNING: This device has no license${NC}"
-  echo -e "${RED}   / \\${NC}"
-  echo -e "${RED}  / ! \\${NC}"
-  echo -e "${RED} /_____\\${NC}"
 fi
 
 cd /data/local/tmp/
