@@ -56,11 +56,9 @@ fi
 # TODO: Cosmog
 if [ -e "/data/local/tmp/aegis.log" ]; then
     log_path='/data/local/tmp/aegis.log'
-    no_license=$(busybox tail -n150 $log_path | grep 'Not licensed' | wc -l)
     busybox tail $log_path
 elif [ -e "/data/local/tmp/atlas.log" ]; then
     log_path='/data/local/tmp/atlas.log'
-    no_license=$(busybox tail -n150 $log_path | grep 'Not licensed' | wc -l)
     busybox tail $log_path
 elif [ "$MITMPKG" = "com.gocheats.launcher" ]; then
     # logcat_output=$(busybox logcat -d | grep 'GoCheats')
