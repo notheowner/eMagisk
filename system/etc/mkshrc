@@ -28,45 +28,4 @@ for dir in "${directories[@]}"; do
   fi
 done
 
-androidVersion=$(getprop ro.build.version.release)
-mitm_version="NOT INSTALLED"
-pogo_version="NOT INSTALLED"
-
-get_mitm_pkg() {
-    local mitm_pkg
-    mitm_pkg=$(busybox ps aux | grep -E -C0 "pokemod|gocheats|sy1vi3" | grep -C0 -v "grep|mapping|worker" | awk -F ' ' '/com.pokemod/{print $NF} /com.sy1vi3/{print $NF} /com.gocheats.launcher/{print $NF}' | grep -E -C0 "gocheats|pokemod|sy1vi3" | sed -e 's/^[0-9]*://' -e 's@:.*@@g' | sort | uniq)
-    if [ -z "$mitm_pkg" ]; then
-        echo "NOT RUNNING"
-    else
-        echo "$mitm_pkg"
-    fi
-}
-MITMPKG=$(get_mitm_pkg)
-POGOPKG=com.nianticlabs.pokemongo
-pogo_version="$(dumpsys package com.nianticlabs.pokemongo | awk -F "=" '/versionName/ {print $2}')"
-
-if [ "$MITMPKG" != "NOT RUNNING" ]; then
-    mitm_version="$(dumpsys package "$MITMPKG" | awk -F "=" '/versionName/ {print $2}')"
-    echo "Android $androidVersion. Pogo: $pogo_version. mitm: $MITMPKG ($mitm_version)"
-else
-    echo "Android $androidVersion. Pogo: $pogo_version. mitm: $MITMPKG"
-fi
-
-# Print most recent logs of MITM on shell login
-# TODO: Cosmog
-if [ -e "/data/local/tmp/aegis.log" ]; then
-    log_path='/data/local/tmp/aegis.log'
-    busybox tail $log_path
-elif [ -e "/data/local/tmp/atlas.log" ]; then
-    log_path='/data/local/tmp/atlas.log'
-    busybox tail $log_path
-elif [ "$MITMPKG" = "com.gocheats.launcher" ]; then
-    # logcat_output=$(busybox logcat -d | grep 'GoCheats')
-    # echo "$logcat_output"
-    log_path=$(find /data/data/com.nianticlabs.pokemongo/cache/ -name "Exeggcute_*log" | tail -n1)
-    busybox tail $log_path
-fi
-
-cd /data/local/tmp/
-
 exec env HOME=<SDCARD> <BIN>/bash --rcfile <SDCARD>/.bashrc
