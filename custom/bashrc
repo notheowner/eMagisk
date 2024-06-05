@@ -580,9 +580,9 @@ pogo_version="$(dumpsys package com.nianticlabs.pokemongo | awk -F "=" '/version
 
 if [ "$MITMPKG" != "NOT RUNNING" ]; then
     mitm_version="$(dumpsys package "$MITMPKG" | awk -F "=" '/versionName/ {print $2}')"
-    echo "Android $androidVersion. Pogo: $pogo_version. mitm: $MITMPKG ($mitm_version)"
+    echo "Android $androidVersion. Pogo: $pogo_version. MITM: $MITMPKG ($mitm_version). Temperature: $(temperature)"
 else
-    echo "Android $androidVersion. Pogo: $pogo_version. mitm: $MITMPKG"
+    echo "Android $androidVersion. Pogo: $pogo_version. MITM: $MITMPKG. Temperature: $(temperature)"
 fi
 
 # Print most recent logs of MITM on shell login
